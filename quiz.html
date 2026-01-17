@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Master Quiz: Polity Ch 3-10</title>
+    <style>
+        /* CSS STYLES */
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#f4f7f6;--panel:#ffffff;--primary:#1a365d;--accent:#c05621;--text:#2d3748}
+        body{font-family: 'Times New Roman', Times, serif; background:var(--bg); color:var(--text); line-height: 1.6;}
+        .header{background:var(--primary); color:#fff; padding:25px; text-align:center; border-bottom: 5px solid var(--accent);}
+        .container{max-width:850px; margin:20px auto; padding:0 15px;}
+        .section{display:none; background:var(--panel); padding:30px; border-radius:4px; box-shadow:0 2px 10px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;}
+        .active{display:block;}
+        .quiz-meta { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; border-bottom: 2px solid #edf2f7; padding-bottom: 10px; }
+        .timer { color: #c53030; }
+        #questionText { font-size: 1.25rem; margin-bottom: 25px; color: #1a202c; font-weight: bold; }
+        .option { padding: 15px; border: 1px solid #cbd5e0; border-radius: 5px; cursor: pointer; margin-bottom: 12px; transition: 0.2s; background: #fff; }
+        .option:hover { background: #f7fafc; border-color: var(--primary); }
+        .option.selected { background: #ebf4ff; border-color: var(--primary); border-width: 2px; }
+        .footer-nav { display: flex; gap: 15px; margin-top: 25px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-grey { background: #718096; color: #fff; }
+        .btn-start { background: #2f855a; color: #fff; width: 100%; margin-top: 20px; }
+        .result-card { text-align: center; }
+        .final-score { font-size: 4rem; color: var(--primary); font-weight: bold; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <h1>UPSC Polity Quiz Master</h1>
+    <p>Comprehensive Practice: Chapters 3 - 10</p>
+</header>
+
+<div class="container">
+    <section id="welcomeSection" class="section active">
+        <h2 style="text-align:center;">Aspirant Login</h2>
+        <p style="text-align:center; font-style: italic; margin: 10px 0;">"Ka hal rauwa ke? Focused practice is the only path to LBSNAA."</p>
+        <form id="startForm">
+            <input type="text" id="userName" placeholder="Enter Your Name" required style="width:100%; padding:12px; margin-bottom:15px; border: 1px solid #ccc;">
+            <select id="langChoice" style="width:100%; padding:12px; border: 1px solid #ccc;">
+                <option value="en">English Medium</option>
+                <option value="hi">Hindi Medium (हिंदी)</option>
+            </select>
+            <button type="submit" class="btn btn-start">Generate Full 50-Question Paper</button>
+        </form>
+    </section>
+
+    <section id="quizSection" class="section">
+        <div class="quiz-meta">
+            <span id="progressText">Q 1/50</span>
+            <span id="timerText" class="timer">30s</span>
+        </div>
+        <div id="questionText">Loading question...</div>
+        <div id="optionsBox"></div>
+        <div class="footer-nav">
+            <button class="btn btn-grey" id="prevBtn">Previous</button>
+            <button class="btn btn-primary" id="nextBtn">Next / Finish</button>
+        </div>
+    </section>
+
+    <section id="resultsSection" class="section result-card">
+        <h2>Your Scorecard</h2>
+        <div class="final-score" id="scoreDisplay">0.00</div>
+        <p id="statsText"></p>
+        <button onclick="location.reload()" class="btn btn-primary" style="margin-top:20px;">Re-attempt New Paper</button>
+    </section>
+</div>
+
+<script>
+    const BANK = [
+        {
+            en: "Which of the following describes India as a 'Secular State'?",
+            hi: "निम्नलिखित में से कौन भारत को एक 'धर्मनिरपेक्ष राज्य' के रूप में वर्णित करता है?",
+            opts_en: ["Fundamental Rights", "Directive Principles", "Fifth Schedule", "Preamble"],
+            opts_hi: ["मौलिक अधिकार", "नीति निर्देशक सिद्धांत", "पांचवीं अनुसूची", "प्रस्तावना"],
+            ans: 3
+        },
+        {
+            en: "The Ninth Schedule was added to the Constitution by which Amendment?",
+            hi: "नौवीं अनुसूची को किस संशोधन द्वारा संविधान में जोड़ा गया था?",
+            opts_en: ["First Amendment", "Eighth Amendment", "Ninth Amendment", "Forty-second Amendment"],
+            opts_hi: ["पहला संशोधन", "आठवां संशोधन", "नौवां संशोधन", "बयालीसवां संशोधन"],
+            ans: 0
+        },
+        {
+            en: "Which Article of the Constitution empowers the Parliament to form new States and alter areas, boundaries or names of existing States?",
+            hi: "संविधान का कौन सा अनुच्छेद संसद को नए राज्य बनाने और मौजूदा राज्यों के क्षेत्रों, सीमाओं या नामों को बदलने का अधिकार देता है?",
+            opts_en: ["Article 1", "Article 2", "Article 3", "Article 4"],
+            opts_hi: ["अनुच्छेद 1", "अनुच्छेद 2", "अनुच्छेद 3", "अनुच्छेद 4"],
+            ans: 2
+        },
+        {
+            en: "The 'Right to Property' was deleted from the list of Fundamental Rights by which Amendment?",
+            hi: "'संपत्ति के अधिकार' को किस संशोधन द्वारा मौलिक अधिकारों की सूची से हटा दिया गया था?",
+            opts_en: ["42nd Amendment", "44th Amendment", "52nd Amendment", "62nd Amendment"],
+            opts_hi: ["42वां संशोधन", "44वां संशोधन", "52वां संशोधन", "62वां संशोधन"],
+            ans: 1
+        },
+        {
+            en: "Which of the following is NOT a Fundamental Duty under Article 51A?",
+            hi: "अनुच्छेद 51A के तहत निम्नलिखित में से कौन सा मौलिक कर्तव्य नहीं है?",
+            opts_en: ["To protect public property", "To develop scientific temper", "To vote in public elections", "To strive towards excellence"],
+            opts_hi: ["सार्वजनिक संपत्ति की रक्षा करना", "वैज्ञानिक दृष्टिकोण विकसित करना", "सार्वजनिक चुनावों में मतदान करना", "उत्कृष्टता की ओर बढ़ने का प्रयास करना"],
+            ans: 2
+        },
+        {
+            en: "The Directive Principles of State Policy are __________ in nature.",
+            hi: "राज्य के नीति निर्देशक सिद्धांत प्रकृति में __________ हैं।",
+            opts_en: ["Justiciable", "Non-justiciable", "Mandatory", "Enforceable by writ"],
+            opts_hi: ["न्यायसंगत", "गैर-न्यायसंगत", "अनिवार्य", "रिट द्वारा प्रवर्तनीय"],
+            ans: 1
+        },
+        {
+            en: "The concept of 'Single Citizenship' in India is borrowed from the Constitution of:",
+            hi: "भारत में 'एकल नागरिकता' की अवधारणा किस संविधान से ली गई है?",
+            opts_en: ["USA", "Canada", "Britain", "Ireland"],
+            opts_hi: ["अमेरिका", "कनाडा", "ब्रिटेन", "आयरलैंड"],
+            ans: 2
+        },
+        {
+            en: "Which Amendment is known as the 'Mini-Constitution' of India?",
+            hi: "किस संशोधन को भारत के 'लघु संविधान' के रूप में जाना जाता है?",
+            opts_en: ["7th Amendment", "24th Amendment", "42nd Amendment", "44th Amendment"],
+            opts_hi: ["7वां संशोधन", "24वां संशोधन", "42वां संशोधन", "44वां संशोधन"],
+            ans: 2
+        },
+        {
+            en: "Under the Indian Constitution, the power to issue a writ of 'Habeas Corpus' is vested in:",
+            hi: "भारतीय संविधान के तहत, 'बंदी प्रत्यक्षीकरण' (Habeas Corpus) रिट जारी करने की शक्ति किसमें निहित है?",
+            opts_en: ["Supreme Court only", "High Courts only", "Both Supreme Court and High Courts", "District Courts"],
+            opts_hi: ["केवल उच्चतम न्यायालय", "केवल उच्च न्यायालय", "उच्चतम और उच्च न्यायालय दोनों", "जिला न्यायालय"],
+            ans: 2
+        },
+        {
+            en: "Which of the following is a 'Unitary' feature of the Indian Constitution?",
+            hi: "निम्नलिखित में से कौन भारतीय संविधान की 'एकात्मक' विशेषता है?",
+            opts_en: ["Written Constitution", "Independent Judiciary", "Single Citizenship", "Dual Government"],
+            opts_hi: ["लिखित संविधान", "स्वतंत्र न्यायपालिका", "एकल नागरिकता", "दोहरी सरकार"],
+            ans: 2
+        },
+        {
+            en: "The 'Instrument of Instructions' contained in the Government of India Act 1935 has been incorporated in the Constitution of India as:",
+            hi: "भारत सरकार अधिनियम 1935 में निहित 'अनुदेश प्रपत्र' (Instrument of Instructions) को भारतीय संविधान में किस रूप में शामिल किया गया है?",
+            opts_en: ["Fundamental Rights", "DPSP", "Fundamental Duties", "Emergency Provisions"],
+            opts_hi: ["मौलिक अधिकार", "नीति निर्देशक सिद्धांत", "मौलिक कर्तव्य", "आपातकालीन प्रावधान"],
+            ans: 1
+        },
+        {
+            en: "The 'Basic Structure Doctrine' was propounded by the Supreme Court in which case?",
+            hi: "'मूल संरचना सिद्धांत' (Basic Structure Doctrine) उच्चतम न्यायालय द्वारा किस मामले में प्रतिपादित किया गया था?",
+            opts_en: ["Golaknath Case", "Minerva Mills Case", "Kesavananda Bharati Case", "Waman Rao Case"],
+            opts_hi: ["गोलकनाथ मामला", "मिनर्वा मिल्स मामला", "केशवानंद भारती मामला", "वामन राव मामला"],
+            ans: 2
+        },
+        {
+            en: "Which Article of the Constitution prohibits discrimination on grounds of religion, race, caste, sex or place of birth?",
+            hi: "संविधान का कौन सा अनुच्छेद धर्म, मूलवंश, जाति, लिंग या जन्म स्थान के आधार पर भेदभाव का निषेध करता है?",
+            opts_en: ["Article 14", "Article 15", "Article 16", "Article 17"],
+            opts_hi: ["अनुच्छेद 14", "अनुच्छेद 15", "अनुच्छेद 16", "अनुच्छेद 17"],
+            ans: 1
+        },
+        {
+            en: "A Bill for the amendment of the Constitution can be introduced in:",
+            hi: "संविधान के संशोधन के लिए एक विधेयक पेश किया जा सकता है:",
+            opts_en: ["Lok Sabha only", "Rajya Sabha only", "Either House of Parliament", "State Legislatures"],
+            opts_hi: ["केवल लोकसभा", "केवल राज्यसभा", "संसद का कोई भी सदन", "राज्य विधानमंडल"],
+            ans: 2
+        },
+        {
+            en: "The ideal of 'Justice' (Social, Economic and Political) in the Preamble is borrowed from:",
+            hi: "प्रस्तावना में 'न्याय' (सामाजिक, आर्थिक और राजनीतिक) का आदर्श कहाँ से लिया गया है?",
+            opts_en: ["French Revolution", "Russian Revolution", "American Revolution", "Irish Constitution"],
+            opts_hi: ["फ्रांसीसी क्रांति", "रूसी क्रांति", "अमेरिकी क्रांति", "आयरिश संविधान"],
+            ans: 1
+        },
+        {
+            en: "Which part of the Constitution is called the 'Conscience of the Constitution'?",
+            hi: "संविधान के किस भाग को 'संविधान की अंतरात्मा' कहा जाता है?",
+            opts_en: ["Preamble", "Fundamental Rights and DPSP", "Fundamental Duties", "Schedules"],
+            opts_hi: ["प्रस्तावना", "मौलिक अधिकार और नीति निर्देशक सिद्धांत", "मौलिक कर्तव्य", "अनुसूचियाँ"],
+            ans: 1
+        },
+        {
+            en: "The 86th Constitutional Amendment Act 2002 provided for:",
+            hi: "86वें संविधान संशोधन अधिनियम 2002 ने किसका प्रावधान किया?",
+            opts_en: ["Right to Information", "Right to Education", "Right to Work", "Right to Privacy"],
+            opts_hi: ["सूचना का अधिकार", "शिक्षा का अधिकार", "काम का अधिकार", "निजता का अधिकार"],
+            ans: 1
+        },
+        {
+            en: "Who described the Directive Principles as 'Pious superfluities'?",
+            hi: "नीति निर्देशक सिद्धांतों को 'पवित्र फालतू बातें' (Pious superfluities) के रूप में किसने वर्णित किया?",
+            opts_en: ["B.R. Ambedkar", "K.C. Wheare", "Sir Ivor Jennings", "Naseeruddin"],
+            opts_hi: ["बी.आर. अंबेडकर", "के.सी. व्हेयर", "सर आइवर जेनिंग्स", "नसीरुद्दीन"],
+            ans: 2
+        },
+        {
+            en: "The power of the Parliament to amend the Constitution under Article 368 includes the power to amend the Preamble. This was held in:",
+            hi: "अनुच्छेद 368 के तहत संविधान में संशोधन करने की संसद की शक्ति में प्रस्तावना में संशोधन करने की शक्ति भी शामिल है। यह किस मामले में कहा गया था?",
+            opts_en: ["Berubari Union Case", "Kesavananda Bharati Case", "LIC of India Case", "Minerva Mills Case"],
+            opts_hi: ["बेरुबारी यूनियन मामला", "केशवानंद भारती मामला", "एलआईसी ऑफ इंडिया मामला", "मिनर्वा मिल्स मामला"],
+            ans: 1
+        },
+        {
+            en: "Which Article guarantees the 'Right to move the Supreme Court' for the enforcement of Fundamental Rights?",
+            hi: "कौन सा अनुच्छेद मौलिक अधिकारों के प्रवर्तन के लिए 'उच्चतम न्यायालय जाने के अधिकार' की गारंटी देता है?",
+            opts_en: ["Article 226", "Article 32", "Article 31", "Article 21"],
+            opts_hi: ["अनुच्छेद 226", "अनुच्छेद 32", "अनुच्छेद 31", "अनुच्छेद 21"],
+            ans: 1
+        },
+        {
+            en: "Separation of the Judiciary from the Executive is mentioned in which Article?",
+            hi: "कार्यपालिका से न्यायपालिका का पृथक्करण किस अनुच्छेद में वर्णित है?",
+            opts_en: ["Article 48", "Article 50", "Article 51", "Article 44"],
+            opts_hi: ["अनुच्छेद 48", "अनुच्छेद 50", "अनुच्छेद 51", "अनुच्छेद 44"],
+            ans: 1
+        },
+        {
+            en: "By which Amendment were the Fundamental Duties incorporated in the Constitution?",
+            hi: "किस संशोधन द्वारा संविधान में मौलिक कर्तव्यों को शामिल किया गया था?",
+            opts_en: ["42nd Amendment", "44th Amendment", "24th Amendment", "1st Amendment"],
+            opts_hi: ["42वां संशोधन", "44वां संशोधन", "24वां संशोधन", "1st संशोधन"],
+            ans: 0
+        },
+        {
+            en: "Promotion of 'International Peace and Security' is mentioned in:",
+            hi: "'अंतरराष्ट्रीय शांति और सुरक्षा' को बढ़ावा देने का उल्लेख किसमें है?",
+            opts_en: ["Preamble", "Fundamental Rights", "DPSP", "Fundamental Duties"],
+            opts_hi: ["प्रस्तावना", "मौलिक अधिकार", "नीति निर्देशक सिद्धांत", "मौलिक कर्तव्य"],
+            ans: 2
+        },
+        {
+            en: "Which Article provides for the 'Abolition of Untouchability'?",
+            hi: "कौन सा अनुच्छेद 'अस्पृश्यता के उन्मूलन' का प्रावधान करता है?",
+            opts_en: ["Article 14", "Article 15", "Article 17", "Article 18"],
+            opts_hi: ["अनुच्छेद 14", "अनुच्छेद 15", "अनुच्छेद 17", "अनुच्छेद 18"],
+            ans: 2
+        },
+        {
+            en: "The provision of 'Joint Sitting' of the two Houses of Parliament is borrowed from:",
+            hi: "संसद के दोनों सदनों की 'संयुक्त बैठक' का प्रावधान कहाँ से लिया गया है?",
+            opts_en: ["Canada", "Australia", "USA", "Ireland"],
+            opts_hi: ["कनाडा", "ऑस्ट्रेलिया", "अमेरिका", "आयरलैंड"],
+            ans: 1
+        },
+        {
+            en: "Freedom of residence and settlement in any part of the territory of India is a Fundamental Right under:",
+            hi: "भारत के राज्यक्षेत्र के किसी भी भाग में निवास करने और बस जाने की स्वतंत्रता किसके तहत एक मौलिक अधिकार है?",
+            opts_en: ["Article 19(1)(d)", "Article 19(1)(e)", "Article 19(1)(c)", "Article 21"],
+            opts_hi: ["अनुच्छेद 19(1)(d)", "अनुच्छेद 19(1)(e)", "अनुच्छेद 19(1)(c)", "अनुच्छेद 21"],
+            ans: 1
+        },
+        {
+            en: "Which Directive Principle mandates the State to organize 'Village Panchayats'?",
+            hi: "कौन सा नीति निर्देशक सिद्धांत राज्य को 'ग्राम पंचायतों' को संगठित करने का निर्देश देता है?",
+            opts_en: ["Article 38", "Article 40", "Article 41", "Article 44"],
+            opts_hi: ["अनुच्छेद 38", "अनुच्छेद 40", "अनुच्छेद 41", "अनुच्छेद 44"],
+            ans: 1
+        },
+        {
+            en: "The 'Uniform Civil Code' for the citizens is mentioned in:",
+            hi: "नागरिकों के लिए 'समान नागरिक संहिता' का उल्लेख किसमें है?",
+            opts_en: ["Article 43", "Article 44", "Article 45", "Article 46"],
+            opts_hi: ["अनुच्छेद 43", "अनुच्छेद 44", "अनुच्छेद 45", "अनुच्छेद 46"],
+            ans: 1
+        },
+        {
+            en: "Which Article protects the 'Interests of Minorities' regarding language, script or culture?",
+            hi: "कौन सा अनुच्छेद भाषा, लिपि या संस्कृति के संबंध में 'अल्पसंख्यकों के हितों' की रक्षा करता है?",
+            opts_en: ["Article 25", "Article 28", "Article 29", "Article 30"],
+            opts_hi: ["अनुच्छेद 25", "अनुच्छेद 28", "अनुच्छेद 29", "अनुच्छेद 30"],
+            ans: 2
+        },
+        {
+            en: "The 44th Amendment Act of 1978 was passed during the prime ministership of:",
+            hi: "1978 का 44वां संशोधन अधिनियम किसके प्रधानमंत्रित्व काल में पारित किया गया था?",
+            opts_en: ["Indira Gandhi", "Morarji Desai", "Rajiv Gandhi", "Charan Singh"],
+            opts_hi: ["इंदिरा गांधी", "मोरारजी देसाई", "राजीव गांधी", "चरण सिंह"],
+            ans: 1
+        },
+        {
+            en: "Which Fundamental Right was described by Dr. B.R. Ambedkar as the 'Heart and Soul' of the Constitution?",
+            hi: "किस मौलिक अधिकार को डॉ. बी.आर. अंबेडकर ने संविधान का 'हृदय और आत्मा' बताया था?",
+            opts_en: ["Right to Equality", "Right against Exploitation", "Right to Constitutional Remedies", "Right to Freedom of Religion"],
+            opts_hi: ["समानता का अधिकार", "शोषण के विरुद्ध अधिकार", "संवैधानिक उपचारों का अधिकार", "धर्म की स्वतंत्रता का अधिकार"],
+            ans: 2
+        },
+        {
+            en: "The 'Suspension of Fundamental Rights' during Emergency is borrowed from:",
+            hi: "आपातकाल के दौरान 'मौलिक अधिकारों का निलंबन' कहाँ से लिया गया है?",
+            opts_en: ["USA", "Canada", "Germany (Weimar)", "South Africa"],
+            opts_hi: ["अमेरिका", "कनाडा", "जर्मनी (वाइमर)", "दक्षिण अफ्रीका"],
+            ans: 2
+        },
+        {
+            en: "Which Article allows the Parliament to provide for the adjudication of disputes relating to waters of inter-State rivers?",
+            hi: "कौन सा अनुच्छेद संसद को अंतर-राज्यीय नदियों के जल से संबंधित विवादों के न्यायनिर्णयन का प्रावधान करने की अनुमति देता है?",
+            opts_en: ["Article 262", "Article 263", "Article 280", "Article 312"],
+            opts_hi: ["अनुच्छेद 262", "अनुच्छेद 263", "अनुच्छेद 280", "अनुच्छेद 312"],
+            ans: 0
+        },
+        {
+            en: "The idea of 'Liberty, Equality and Fraternity' in the Preamble is borrowed from:",
+            hi: "प्रस्तावना में 'स्वतंत्रता, समानता और बंधुत्व' का विचार कहाँ से लिया गया है?",
+            opts_en: ["Russian Revolution", "French Revolution", "Irish Constitution", "American Constitution"],
+            opts_hi: ["रूसी क्रांति", "फ्रांसीसी क्रांति", "आयरिश संविधान", "अमेरिकी संविधान"],
+            ans: 1
+        },
+        {
+            en: "Under which Article can a person be naturalised as a citizen of India?",
+            hi: "किस अनुच्छेद के तहत किसी व्यक्ति को भारत के नागरिक के रूप में देशीयकृत किया जा सकता है?",
+            opts_en: ["Article 5", "Article 6", "Article 11", "Article 8"],
+            opts_hi: ["अनुच्छेद 5", "अनुच्छेद 6", "अनुच्छेद 11", "अनुच्छेद 8"],
+            ans: 2
+        },
+        {
+            en: "Protection against 'Double Jeopardy' is mentioned in:",
+            hi: "'दोहरे दंड' (Double Jeopardy) से संरक्षण का उल्लेख किसमें है?",
+            opts_en: ["Article 20(1)", "Article 20(2)", "Article 20(3)", "Article 21"],
+            opts_hi: ["अनुच्छेद 20(1)", "अनुच्छेद 20(2)", "अनुच्छेद 20(3)", "अनुच्छेद 21"],
+            ans: 1
+        },
+        {
+            en: "Which of the following Fundamental Rights cannot be suspended even during a National Emergency?",
+            hi: "निम्नलिखित में से कौन से मौलिक अधिकार राष्ट्रीय आपातकाल के दौरान भी निलंबित नहीं किए जा सकते?",
+            opts_en: ["Articles 19 and 20", "Articles 20 and 21", "Articles 21 and 22", "Articles 14 and 15"],
+            opts_hi: ["अनुच्छेद 19 और 20", "अनुच्छेद 20 और 21", "अनुच्छेद 21 और 22", "अनुच्छेद 14 और 15"],
+            ans: 1
+        },
+        {
+            en: "The provision for 'Free Legal Aid' to the poor is mentioned in:",
+            hi: "गरीबों के लिए 'मुफ्त कानूनी सहायता' का प्रावधान किसमें वर्णित है?",
+            opts_en: ["Article 39", "Article 39A", "Article 41", "Article 43A"],
+            opts_hi: ["अनुच्छेद 39", "अनुच्छेद 39A", "अनुच्छेद 41", "अनुच्छेद 43A"],
+            ans: 1
+        },
+        {
+            en: "In which year was the 'Citizenship Act' passed by the Parliament?",
+            hi: "संसद द्वारा 'नागरिकता अधिनियम' किस वर्ष पारित किया गया था?",
+            opts_en: ["1950", "1952", "1955", "1960"],
+            opts_hi: ["1950", "1952", "1955", "1960"],
+            ans: 2
+        },
+        {
+            en: "Which Article prevents the State from making any law which takes away or abridges the Fundamental Rights?",
+            hi: "कौन सा अनुच्छेद राज्य को ऐसी कोई भी विधि बनाने से रोकता है जो मौलिक अधिकारों को छीनती या कम करती है?",
+            opts_en: ["Article 12", "Article 13", "Article 32", "Article 226"],
+            opts_hi: ["अनुच्छेद 12", "अनुच्छेद 13", "अनुच्छेद 32", "अनुच्छेद 226"],
+            ans: 1
+        },
+        {
+            en: "The Preamble was amended for the first time by which Amendment Act?",
+            hi: "प्रस्तावना में पहली बार किस संशोधन अधिनियम द्वारा संशोधन किया गया था?",
+            opts_en: ["24th Amendment", "42nd Amendment", "44th Amendment", "None of the above"],
+            opts_hi: ["24वां संशोधन", "42वां संशोधन", "44वां संशोधन", "उपरोक्त में से कोई नहीं"],
+            ans: 1
+        },
+        {
+            en: "Which Constitutional Amendment reduced the voting age from 21 years to 18 years?",
+            hi: "किस संविधान संशोधन ने मतदान की आयु 21 वर्ष से घटाकर 18 वर्ष कर दी?",
+            opts_en: ["61st Amendment", "62nd Amendment", "63rd Amendment", "64th Amendment"],
+            opts_hi: ["61वां संशोधन", "62वां संशोधन", "63वां संशोधन", "64वां संशोधन"],
+            ans: 0
+        },
+        {
+            en: "Protection in respect of 'Conviction for Offences' is given under:",
+            hi: "'अपराधों के लिए दोषसिद्धि' के संबंध में संरक्षण किसके तहत दिया गया है?",
+            opts_en: ["Article 19", "Article 20", "Article 21", "Article 22"],
+            opts_hi: ["अनुच्छेद 19", "अनुच्छेद 20", "अनुच्छेद 21", "अनुच्छेद 22"],
+            ans: 1
+        },
+        {
+            en: "Which Article mandates the State to protect and improve the 'Environment'?",
+            hi: "कौन सा अनुच्छेद राज्य को 'पर्यावरण' की रक्षा और सुधार करने का निर्देश देता है?",
+            opts_en: ["Article 48", "Article 48A", "Article 49", "Article 51"],
+            opts_hi: ["अनुच्छेद 48", "अनुच्छेद 48A", "अनुच्छेद 49", "अनुच्छेद 51"],
+            ans: 1
+        },
+        {
+            en: "The total number of Fundamental Duties in the Indian Constitution is:",
+            hi: "भारतीय संविधान में मौलिक कर्तव्यों की कुल संख्या है:",
+            opts_en: ["9", "10", "11", "12"],
+            opts_hi: ["9", "10", "11", "12"],
+            ans: 2
+        },
+        {
+            en: "The word 'Sovereign' in the Preamble implies:",
+            hi: "प्रस्तावना में 'संप्रभु' (Sovereign) शब्द का तात्पर्य है:",
+            opts_en: ["India is a dependency", "India is a dominion", "India is an independent state", "India is a part of British Empire"],
+            opts_hi: ["भारत एक निर्भरता है", "भारत एक अधिराज्य (Dominion) है", "भारत एक स्वतंत्र राज्य है", "भारत ब्रिटिश साम्राज्य का हिस्सा है"],
+            ans: 2
+        },
+        {
+            en: "Which Article grants the right to establish and administer educational institutions to minorities?",
+            hi: "कौन सा अनुच्छेद अल्पसंख्यकों को शिक्षण संस्थान स्थापित करने और प्रशासित करने का अधिकार देता है?",
+            opts_en: ["Article 28", "Article 29", "Article 30", "Article 32"],
+            opts_hi: ["अनुच्छेद 28", "अनुच्छेद 29", "अनुच्छेद 30", "अनुच्छेद 32"],
+            ans: 2
+        },
+        {
+            en: "An amendment to the Constitution requiring ratification by the States must be passed by:",
+            hi: "राज्यों द्वारा अनुसमर्थन की आवश्यकता वाले संविधान संशोधन को किसके द्वारा पारित किया जाना चाहिए?",
+            opts_en: ["Simple majority in Parliament", "Special majority in Parliament", "Special majority + ratification by 1/2 of States", "Absolute majority in Parliament"],
+            opts_hi: ["संसद में साधारण बहुमत", "संसद में विशेष बहुमत", "विशेष बहुमत + 1/2 राज्यों द्वारा अनुसमर्थन", "संसद में पूर्ण बहुमत"],
+            ans: 2
+        },
+        {
+            en: "The procedure for 'Election of Rajya Sabha Members' is borrowed from:",
+            hi: "'राज्यसभा सदस्यों के चुनाव' की प्रक्रिया कहाँ से ली गई है?",
+            opts_en: ["Ireland", "South Africa", "USA", "Canada"],
+            opts_hi: ["आयरलैंड", "दक्षिण अफ्रीका", "अमेरिका", "कनाडा"],
+            ans: 1
+        },
+        {
+            en: "Who has the power to prescribe the conditions for the 'Acquisition and Termination' of citizenship?",
+            hi: "नागरिकता की 'प्राप्ति और समाप्ति' के लिए शर्तें निर्धारित करने की शक्ति किसके पास है?",
+            opts_en: ["The President", "The Parliament", "Supreme Court", "Election Commission"],
+            opts_hi: ["राष्ट्रपति", "संसद", "उच्चतम न्यायालय", "चुनाव आयोग"],
+            ans: 1
+        }
+    ];
+
+    let state = {
+        idx: 0, 
+        responses: new Array(50).fill(null), 
+        timer: 30, 
+        interval: null, 
+        lang: 'en'
+    };
+
+    const startForm = document.getElementById('startForm');
+    const welcomeSection = document.getElementById('welcomeSection');
+    const quizSection = document.getElementById('quizSection');
+    const resultsSection = document.getElementById('resultsSection');
+
+    startForm.onsubmit = (e) => {
+        e.preventDefault();
+        state.lang = document.getElementById('langChoice').value;
+        welcomeSection.classList.remove('active');
+        quizSection.classList.add('active');
+        loadQuestion();
+        startTimer();
+    };
+
+    function loadQuestion() {
+        const q = BANK[state.idx];
+        document.getElementById('progressText').innerText = `Q ${state.idx + 1} / 50`;
+        document.getElementById('questionText').innerText = (state.lang === 'hi') ? q.hi : q.en;
+        
+        const box = document.getElementById('optionsBox');
+        box.innerHTML = '';
+        
+        const opts = (state.lang === 'hi') ? q.opts_hi : q.opts_en;
+        opts.forEach((text, i) => {
+            const div = document.createElement('div');
+            div.className = 'option' + (state.responses[state.idx] === i ? ' selected' : '');
+            div.innerText = text;
+            div.onclick = () => {
+                state.responses[state.idx] = i;
+                loadQuestion();
+            };
+            box.appendChild(div);
+        });
+    }
+
+    function startTimer() {
+        state.interval = setInterval(() => {
+            state.timer--;
+            document.getElementById('timerText').innerText = state.timer + 's';
+            if(state.timer <= 0) {
+                if(state.idx < 49) {
+                    state.idx++;
+                    state.timer = 30;
+                    loadQuestion();
+                } else {
+                    showResult();
+                }
+            }
+        }, 1000);
+    }
+
+    document.getElementById('nextBtn').onclick = () => {
+        if(state.idx < 49) {
+            state.idx++;
+            state.timer = 30;
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    };
+
+    document.getElementById('prevBtn').onclick = () => {
+        if(state.idx > 0) {
+            state.idx--;
+            state.timer = 30;
+            loadQuestion();
+        }
+    };
+
+    function showResult() {
+        clearInterval(state.interval);
+        quizSection.classList.remove('active');
+        resultsSection.classList.add('active');
+
+        let correct = 0;
+        let wrong = 0;
+        state.responses.forEach((ans, i) => {
+            if(ans !== null) {
+                if(ans === BANK[i].ans) correct++;
+                else wrong++;
+            }
+        });
+
+        const score = (correct * 2) - (wrong * 0.66);
+        document.getElementById('scoreDisplay').innerText = score.toFixed(2);
+        document.getElementById('statsText').innerText = `Correct: ${correct} | Wrong: ${wrong} | Unattempted: ${50 - (correct + wrong)}`;
+    }
+</script>
+
+</body>
